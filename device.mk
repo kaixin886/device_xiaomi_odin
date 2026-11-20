@@ -200,6 +200,13 @@ PRODUCT_PACKAGES += \
 PRODUCT_ENABLE_UFFD_GC := true
 OVERRIDE_ENABLE_UFFD_GC := true
 
+# Configure 16 GiB of ZRAM. Android 17 MMD consumes these when its AConfig flag
+# is enabled; otherwise init's swapon_all fallback uses fstab.qcom.
+PRODUCT_SYSTEM_PROPERTIES += \
+    mmd.zram.enabled=true \
+    mmd.zram.size=17179869184 \
+    mmd.zram.comp_algorithm=lz4k
+
 # Keylayout
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/keylayout/gpio-keys.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/gpio-keys.kl \

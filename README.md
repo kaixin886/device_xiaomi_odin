@@ -25,3 +25,11 @@ Camera  | 108MP(Primary), 13MP(Ultrawide), 8MP(Telephoto), dual LED flash, 20MP(
 
 
 ![Xiaomi MIX 4](https://fdn2.gsmarena.com/vv/pics/xiaomi/mix-4-1.jpg "Xiaomi MIX 4")
+
+## Scheme A: 16 GiB ZRAM through ROM init
+
+This is the standalone ROM/device-tree option on the `integration/odin-zram-16g` branch, based on Inkypen's LineageOS 24.0 odin tree. It configures `mmd.zram.enabled=true`, `mmd.zram.size=17179869184` (bytes), and `mmd.zram.comp_algorithm=lz4k`.
+
+The device init waits for Android 17 MMD to publish `mmd.enabled_aconfig`, then runs `swapon_all` against the vendor fstab. If the MMD AConfig flag is enabled, AOSP fs_mgr skips its fstab ZRAM setup and MMD uses the properties above. If that flag is disabled, fs_mgr applies the fstab `zramsize=17179869184` fallback. In the fallback path, LZ4K depends on the paired kernel's default compressor. See the [Android MMD configuration](https://source.android.com/docs/core/perf/mmd) and the [AOSP fs_mgr MMD integration](https://android.googlesource.com/platform/system/core.git/+/1d4dc2f4bcfc1045d0114d0d3fce278f601d208).
+
+Disable Scene's ZRAM management before using this ROM configuration so only one component initializes ZRAM. This device-tree change is separate from the kernel-only Scheme C branch, where Scene remains responsible for the 16 GiB capacity. Scheme A requires building and flashing a ROM containing this branch; it has not yet been tested on the MIX 4, and no performance or power benefit is claimed.
